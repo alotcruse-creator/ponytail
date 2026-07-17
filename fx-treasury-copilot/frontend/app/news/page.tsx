@@ -1,11 +1,16 @@
+export const dynamic = "force-dynamic";
+
 import { Card, Dir, Stars } from "@/components/Card";
 import { api, type News } from "@/lib/api";
 
 export default async function NewsPage() {
-  const news = await api<News[]>("/news");
+  const news = await api<News[]>("/news", []);
   return (
     <div className="space-y-3">
       <h1 className="text-lg font-semibold">Market News</h1>
+      {news.length === 0 && (
+        <Card><p className="text-muted text-sm">No data — backend may be starting up. Refresh in 30s.</p></Card>
+      )}
       {news.map((n) => (
         <Card key={n.id}>
           <div className="flex items-start justify-between gap-4">

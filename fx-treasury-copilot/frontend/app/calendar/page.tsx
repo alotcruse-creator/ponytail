@@ -1,20 +1,27 @@
+export const dynamic = "force-dynamic";
+
 import { Card, Stars } from "@/components/Card";
 import { api, type Event } from "@/lib/api";
 
+const EMPTY = { events: [] as Event[], top5: [] as Event[] };
+
 export default async function CalendarPage() {
-  const { events, top5 } = await api<{ events: Event[]; top5: Event[] }>("/calendar");
+  const { events, top5 } = await api<{ events: Event[]; top5: Event[] }>("/calendar", EMPTY);
   return (
     <div className="space-y-4">
       <h1 className="text-lg font-semibold">Economic Calendar</h1>
 
       <Card title="AI — Today's Top Events">
-        <ol className="text-sm space-y-1 list-decimal list-inside">
-          {top5.map((e) => (
-            <li key={e.id}>
-              {e.event} <span className="text-muted">({e.currency})</span> — likely FX impact on {e.currency}
-            </li>
-          ))}
-        </ol>
+        {top5.length === 0
+          ? <p className="text-muted text-sm">No data — backend may be starting up.</p>
+          : <ol className="text-sm space-y-1 list-decimal list-inside">
+              {top5.map((e) => (
+                <li key={e.id}>
+                  {e.event} <span className="text-muted">({e.currency})</span> — likely FX impact on {e.currency}
+                </li>
+              ))}
+            </ol>
+        }
       </Card>
 
       <Card>

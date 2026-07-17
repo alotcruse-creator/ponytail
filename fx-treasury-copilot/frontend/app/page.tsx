@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Card, Dir, Stars } from "@/components/Card";
 import { SentimentChart } from "@/components/SentimentChart";
 import { api, type Event, type News, type Sentiment } from "@/lib/api";
@@ -5,11 +7,14 @@ import { api, type Event, type News, type Sentiment } from "@/lib/api";
 type Market = { sentiment: Sentiment[]; high_impact: Event[]; top_news: News[] };
 type Php = { sentiment: Sentiment; drivers: string[]; commentary: string };
 
+const EMPTY_MARKET: Market = { sentiment: [], high_impact: [], top_news: [] };
+const EMPTY_PHP: Php = { sentiment: { currency: "PHP", label: "Neutral", score: 50 }, drivers: [], commentary: "Loading…" };
+
 export default async function Dashboard() {
   const [market, php, brief] = await Promise.all([
-    api<Market>("/market-summary"),
-    api<Php>("/php"),
-    api<{ brief: string }>("/morning-brief"),
+    api<Market>("/market-summary", EMPTY_MARKET),
+    api<Php>("/php", EMPTY_PHP),
+    api<{ brief: string }>("/morning-brief", { brief: "Loading morning brief…" }),
   ]);
 
   return (
@@ -23,7 +28,9 @@ export default async function Dashboard() {
             </div>
           ))}
         </div>
-        <div className="mt-4"><SentimentChart data={market.sentiment} /></div>
+        {market.sentiment.length > 0 && (
+          <div className="mt-4"><SentimentChart data={market.sentiment} /></div>
+        )}
       </Card>
 
       <Card title="Today's High Impact Events">
@@ -34,6 +41,7 @@ export default async function Dashboard() {
               <Stars n={e.importance} />
             </li>
           ))}
+          {market.high_impact.length === 0 && <li className="py-2 text-muted">No data — backend may be starting up.</li>}
         </ul>
       </Card>
 
@@ -57,6 +65,7 @@ export default async function Dashboard() {
               <Dir label={n.sentiment} />
             </li>
           ))}
+          {market.top_news.length === 0 && <li className="py-2 text-muted">No data — backend may be starting up.</li>}
         </ul>
       </Card>
 
