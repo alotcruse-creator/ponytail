@@ -27,6 +27,26 @@ cd frontend && npm install && npm run dev
 
 `GET /docs` on the backend lists every endpoint. Data seeds itself on first run.
 
+## Deploy (free, view it on your phone)
+
+Two free services; open the Vercel URL on your phone and bookmark it.
+
+**Backend → Render** (blueprint included):
+1. Push this repo to GitHub (done if you're reading this there).
+2. Render → **New > Blueprint** → pick this repo. It reads `render.yaml` and
+   creates the backend. (Optional: add `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`
+   in the service's Environment tab.)
+3. Copy the service URL, e.g. `https://fx-copilot-backend.onrender.com`.
+
+**Frontend → Vercel**:
+1. Vercel → **Add New > Project** → import this repo.
+2. Set **Root Directory** to `fx-treasury-copilot/frontend`.
+3. Add env var `NEXT_PUBLIC_API_URL` = your Render URL from above. Deploy.
+
+Open the Vercel URL on your phone. Render's free backend sleeps after ~15 min
+idle, so the first load each morning cold-starts (~30–50s); later loads are
+instant.
+
 ## AI (optional, dual-provider)
 
 Set either `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` (or both) to get live
