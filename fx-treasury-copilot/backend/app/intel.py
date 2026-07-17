@@ -89,23 +89,43 @@ def end_of_day(news, events, sentiment) -> str:
 
 
 def _ai(prompt: str, fallback: str) -> str:
-    """Call OpenAI if a key is set; otherwise return the deterministic text.
+    """Narrate the facts via the first AI provider that works.
 
-    ponytail: no key, no network dependency, app still ships a brief. The AI is
-    a nice-to-have narrator, never a hard requirement.
+    Tries each provider in order; one with no key returns None and is skipped,
+    one that errors is skipped too. If none produce text, the deterministic
+    fallback ships — the AI is a narrator, never a hard requirement.
     """
+    for provider in (_anthropic, _openai):
+        try:
+            text = provider(prompt)
+        except Exception:
+            continue  # ponytail: provider down -> try the next, then fallback
+        if text:
+            return text.strip()
+    return fallback
+
+
+def _anthropic(prompt: str) -> str | None:
+    key = os.getenv("ANTHROPIC_API_KEY")
+    if not key:
+        return None
+    from anthropic import Anthropic
+    r = Anthropic(api_key=key).messages.create(
+        model=os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
+        max_tokens=180, messages=[{"role": "user", "content": prompt}])
+    return r.content[0].text
+
+
+def _openai(prompt: str) -> str | None:
     key = os.getenv("OPENAI_API_KEY")
     if not key:
-        return fallback
-    try:
-        from openai import OpenAI
-        r = OpenAI(api_key=key).chat.completions.create(
-            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=180, temperature=0.3)
-        return (r.choices[0].message.content or fallback).strip()
-    except Exception:
-        return fallback  # ponytail: degrade to deterministic text, never 500
+        return None
+    from openai import OpenAI
+    r = OpenAI(api_key=key).chat.completions.create(
+        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=180, temperature=0.3)
+    return r.choices[0].message.content
 
 
 def _selfcheck() -> None:
@@ -125,8 +145,9 @@ def _selfcheck() -> None:
     events = [{"event": "CPI", "currency": "USD", "time": "20:30",
                "importance": 5}]
     assert top_events(events, 5)[0]["event"] == "CPI"
-    # AI degrades to fallback when no key
+    # AI degrades to fallback when no provider key is set
     os.environ.pop("OPENAI_API_KEY", None)
+    os.environ.pop("ANTHROPIC_API_KEY", None)
     assert "risk level" in morning_brief(news, events, []).lower()
     print("intel self-check ok")
 

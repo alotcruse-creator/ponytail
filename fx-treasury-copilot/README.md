@@ -27,11 +27,14 @@ cd frontend && npm install && npm run dev
 
 `GET /docs` on the backend lists every endpoint. Data seeds itself on first run.
 
-## AI (optional)
+## AI (optional, dual-provider)
 
-Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default `gpt-4o-mini`) to
-get live morning-brief / end-of-day / commentary text. Without a key the app
-returns deterministic rule-based summaries — nothing breaks.
+Set either `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` (or both) to get live
+morning-brief / end-of-day / commentary text. Providers are tried in order —
+Anthropic, then OpenAI — so if one key is missing or its API is down, the other
+serves the request. Models default to `claude-haiku-4-5-20251001` and
+`gpt-4o-mini` (override with `ANTHROPIC_MODEL` / `OPENAI_MODEL`). With no key at
+all, the app returns deterministic rule-based summaries — nothing breaks.
 
 ## Deliberately deferred (Phase 1 laziness, on purpose)
 
