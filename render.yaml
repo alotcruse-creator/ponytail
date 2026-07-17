@@ -18,3 +18,17 @@ services:
         sync: false
       - key: OPENAI_API_KEY
         sync: false
+
+  # Next.js frontend, same repo, its own subfolder. next start honours $PORT.
+  - type: web
+    name: fx-copilot-frontend
+    runtime: node
+    rootDir: fx-treasury-copilot/frontend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npx next start -p $PORT
+    envVars:
+      # Point the UI at the backend service above. Replace with your backend
+      # URL if it differs.
+      - key: NEXT_PUBLIC_API_URL
+        value: https://fx-pf1g.onrender.com
