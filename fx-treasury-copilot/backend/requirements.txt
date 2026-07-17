@@ -1,0 +1,5 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+sqlalchemy==2.0.35
+# openai is optional: only needed for live AI summaries. The app runs without it.
+openai==1.51.0
