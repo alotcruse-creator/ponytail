@@ -31,12 +31,20 @@ cd frontend && npm install && npm run dev
 
 Two free services; open the Vercel URL on your phone and bookmark it.
 
-**Backend → Render** (blueprint included):
-1. Push this repo to GitHub (done if you're reading this there).
-2. Render → **New > Blueprint** → pick this repo. It reads `render.yaml` and
-   creates the backend. (Optional: add `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`
-   in the service's Environment tab.)
-3. Copy the service URL, e.g. `https://fx-copilot-backend.onrender.com`.
+**Backend → Render.** Render reads `render.yaml` from the repo **root** and from
+the branch you point it at. Two ways:
+
+- *Manual (works from any branch, no merge needed):* Render → **New > Web
+  Service** → pick this repo → choose your branch → set **Root Directory** to
+  `fx-treasury-copilot/backend`, **Build** `pip install -r requirements.txt`,
+  **Start** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, plan **Free**.
+- *Blueprint:* Render → **New > Blueprint** → pick this repo. It uses the
+  root `render.yaml`. If you get "render.yaml not found on main", either select
+  the branch that has it or merge the PR to `main` first.
+
+Optional: add `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in the service's
+Environment tab. Then copy the service URL, e.g.
+`https://fx-copilot-backend.onrender.com`.
 
 **Frontend → Vercel**:
 1. Vercel → **Add New > Project** → import this repo.
