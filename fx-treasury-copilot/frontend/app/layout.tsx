@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter, IBM_Plex_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { Freshness } from "@/components/Freshness";
+import { AuthGate } from "@/components/AuthGate";
 
 const serif = Fraunces({
   subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"],
@@ -25,9 +26,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
       <body>
-        <Nav />
-        <Freshness />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">{children}</main>
+        <AuthGate>
+          <Nav />
+          <Freshness />
+          <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">{children}</main>
+        </AuthGate>
       </body>
     </html>
   );

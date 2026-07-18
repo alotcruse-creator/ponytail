@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { api, type Status } from "@/lib/api";
+import { api, clearToken, type Status } from "@/lib/api";
 
 const EMPTY: Status = { generated_at: "", news_live: false, rates_as_of: null };
 
@@ -31,6 +31,12 @@ export function Freshness() {
         className="ml-auto font-mono text-muted hover:text-paper transition-colors border border-border rounded px-2 py-0.5"
       >
         ↻ refresh
+      </button>
+      <button
+        onClick={() => { clearToken(); window.location.reload(); }}
+        className="font-mono text-muted hover:text-bear transition-colors border border-border rounded px-2 py-0.5"
+      >
+        sign out
       </button>
     </div>
   );

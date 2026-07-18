@@ -7,19 +7,36 @@ Endpoints: /news /calendar /php /market-summary /rates /morning-brief
 import time
 from datetime import date, datetime, timedelta
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 from pydantic import BaseModel
 
 from . import (intel, rates, news_feed, exposure, liquidity, chat,
-               scenario, watch, flows, coverage)
+               scenario, watch, flows, coverage, auth)
 from .db import News, CalendarEvent, Sentiment, Session
 from .seed import seed
 from .book import seed_book
 
-app = FastAPI(title="FX Treasury Copilot", version="0.2.0")
+app = FastAPI(title="FX Treasury Copilot", version="0.3.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
                    allow_headers=["*"])  # ponytail: open CORS for local dev; lock down on deploy
+
+# Endpoints reachable without a token (login itself + liveness + preflight).
+_PUBLIC_PATHS = {"/login", "/health", "/docs", "/openapi.json", "/"}
+
+
+@app.middleware("http")
+async def _auth_gate(request, call_next):
+    if (auth.auth_enabled() and request.method != "OPTIONS"
+            and request.url.path not in _PUBLIC_PATHS):
+        header = request.headers.get("authorization", "")
+        token = header[7:] if header.lower().startswith("bearer ") else ""
+        if not auth.verify_token(token):
+            # ACAO so the browser can read the 401 instead of a masked CORS error
+            return JSONResponse({"detail": "Unauthorized"}, status_code=401,
+                                headers={"Access-Control-Allow-Origin": "*"})
+    return await call_next(request)
 
 _NEWS_TTL = 900  # 15 min; RSS updates roughly this often
 _news_cache: dict[str, object] = {"at": 0.0, "items": [], "live": False}
@@ -80,6 +97,22 @@ def _group_by_day(events: list[dict]) -> list[dict]:
 @app.get("/health")
 def health() -> dict:
     return {"ok": True}
+
+
+class LoginIn(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/login")
+def login(body: LoginIn) -> dict:
+    if not auth.auth_enabled():
+        # Gate not configured on this backend yet — issue an open token so the
+        # UI works, but access is effectively public until AUTH_* env is set.
+        return {"token": auth.make_token("open@local"), "auth": "disabled"}
+    if auth.check_credentials(body.email, body.password):
+        return {"token": auth.make_token(body.email.strip().lower()), "auth": "enabled"}
+    raise HTTPException(status_code=401, detail="Invalid email or password")
 
 
 @app.get("/status")

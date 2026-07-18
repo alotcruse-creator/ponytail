@@ -3,9 +3,33 @@
 // browser wait instead of hitting Vercel's 10s serverless limit.
 export const BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://fx-backend-yrpw.onrender.com";
 
+const TOKEN_KEY = "fxc_token";
+
+export function getToken(): string | null {
+  return typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
+}
+export function setToken(t: string): void {
+  if (typeof window !== "undefined") localStorage.setItem(TOKEN_KEY, t);
+}
+export function clearToken(): void {
+  if (typeof window !== "undefined") localStorage.removeItem(TOKEN_KEY);
+}
+
+function authHeaders(): Record<string, string> {
+  const t = getToken();
+  return t ? { Authorization: `Bearer ${t}` } : {};
+}
+
+// A stale/expired token: drop it and bounce back to the login gate.
+function handle401(): void {
+  clearToken();
+  if (typeof window !== "undefined") window.location.reload();
+}
+
 export async function api<T>(path: string, fallback: T): Promise<T> {
   try {
-    const r = await fetch(`${BASE}${path}`, { cache: "no-store" });
+    const r = await fetch(`${BASE}${path}`, { cache: "no-store", headers: authHeaders() });
+    if (r.status === 401) { handle401(); return fallback; }
     if (!r.ok) return fallback;
     return r.json() as Promise<T>;
   } catch {
@@ -17,14 +41,32 @@ export async function post<T>(path: string, body: unknown, fallback: T): Promise
   try {
     const r = await fetch(`${BASE}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify(body),
       cache: "no-store",
     });
+    if (r.status === 401) { handle401(); return fallback; }
     if (!r.ok) return fallback;
     return r.json() as Promise<T>;
   } catch {
     return fallback;
+  }
+}
+
+// Direct login call (does not go through the authed helpers above).
+export async function login(email: string, password: string): Promise<string | null> {
+  try {
+    const r = await fetch(`${BASE}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      cache: "no-store",
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.token ?? null;
+  } catch {
+    return null;
   }
 }
 
