@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getToken, setToken, login } from "@/lib/api";
+import { Logo } from "./Logo";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false);
@@ -36,7 +37,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-2.5 mb-8">
-          <span className="h-2 w-2 rotate-45 bg-accent shadow-[0_0_8px_rgba(201,169,107,0.6)]" />
+          <Logo className="h-7 w-7" />
           <span className="font-serif text-xl text-paper tracking-tight">
             FX <span className="italic text-accent">Copilot</span>
           </span>

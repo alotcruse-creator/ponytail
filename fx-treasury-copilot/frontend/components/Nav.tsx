@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Logo } from "./Logo";
 
 const GROUPS: [string, string][][] = [
   [["/", "Dashboard"], ["/news", "News"], ["/calendar", "Calendar"], ["/php", "PHP"]],
@@ -29,8 +30,8 @@ export function Nav() {
   return (
     <nav className="sticky top-0 z-20 border-b border-border/80 bg-bg/70 backdrop-blur-xl">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-15 flex items-center gap-4">
-        <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-          <span className="h-2 w-2 rotate-45 bg-accent shadow-[0_0_8px_rgba(201,169,107,0.6)]" />
+        <Link href="/" className="flex items-center gap-2 shrink-0 group">
+          <Logo className="h-5 w-5" />
           <span className="font-serif text-lg leading-none text-paper tracking-tight">
             FX <span className="italic text-accent">Copilot</span>
           </span>
