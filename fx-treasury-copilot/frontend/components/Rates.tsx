@@ -37,11 +37,11 @@ export function Rates({ snap, loading }: { snap: RatesSnapshot; loading: boolean
 
       <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
         {php && (
-          <div className="flex items-end gap-4">
+          <div className="flex flex-wrap items-end gap-4">
             <div>
               <div className="text-[10px] font-mono text-muted mb-0.5">USD / PHP</div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold font-mono text-slate-100">{fmt(php.rate)}</span>
+                <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-100">{fmt(php.rate)}</span>
                 {trend !== 0 && (
                   <span className={`text-xs font-mono ${trend >= 0 ? "text-bear" : "text-bull"}`}>
                     {trend >= 0 ? "▲" : "▼"} {Math.abs(trend).toFixed(3)} / 30d

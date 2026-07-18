@@ -10,7 +10,12 @@ body {
   background-image: radial-gradient(circle at 1px 1px, rgba(33, 38, 45, 0.8) 1px, transparent 1px);
   background-size: 28px 28px;
   min-height: 100vh;
+  overflow-x: hidden;  /* nothing should scroll the page sideways on mobile */
 }
+
+/* horizontal scroll strips (e.g. the nav) hide their scrollbar */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
