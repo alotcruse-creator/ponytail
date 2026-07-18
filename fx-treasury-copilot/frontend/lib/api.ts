@@ -81,3 +81,50 @@ export type Liquidity = {
   base_horizon_days: number; as_of: string;
   currencies: LiquidityCcy[]; alerts: Alert[]; commentary: string;
 };
+
+// ── Phase 5 ──
+export type Sensitivity = { currency: string; usd_exposure: number; dpnl_per_1pct: number };
+export type ScenarioPreset = {
+  name: string; description: string; shocks: Record<string, number>;
+  pnl_usd: number; pnl_label: string;
+  by_currency: { currency: string; shock_pct: number; pnl_usd: number }[];
+};
+export type Scenario = {
+  as_of: string;
+  sensitivities: Sensitivity[];
+  var: { per_currency: { currency: string; var_usd: number }[]; portfolio_var_usd: number; portfolio_label: string };
+  presets: ScenarioPreset[];
+  commentary: string;
+};
+export type CustomShock = {
+  shocks: Record<string, number>; total_pnl_usd: number; total_label: string;
+  by_currency: { currency: string; shock_pct: number; pnl_usd: number }[];
+};
+
+export type Trigger = {
+  id: number; kind: string; currency: string; op: string; level: number;
+  note: string; current: number | null; current_label: string; level_label: string; status: string;
+};
+export type Alerts = { triggers: Trigger[]; fired: number; total: number };
+
+export type Corridor = {
+  currency: string; country: string; base_daily_usd: number; base_label: string;
+  today_factor: number; total_usd: number; total_label: string;
+  avg_daily_usd: number; avg_label: string;
+  peak: { date: string; expected_usd: number; factor: number };
+  series: { date: string; expected_usd: number; factor: number }[];
+};
+export type Flows = { horizon_days: number; as_of: string; corridors: Corridor[]; commentary: string };
+
+export type CoverageRow = {
+  currency: string; country: string;
+  forecast_usd: number; forecast_label: string;
+  hedged_usd: number; hedged_label: string;
+  open_usd: number; open_label: string;
+  coverage_pct: number; status: string;
+  carry_pa: number; carry_label: string; carry_sign: string;
+};
+export type Coverage = {
+  cover_days: number; target_low: number; target_high: number; as_of: string;
+  rows: CoverageRow[]; total_open_usd: number; total_open_label: string; commentary: string;
+};

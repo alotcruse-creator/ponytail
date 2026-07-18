@@ -3,11 +3,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const LINKS = [
-  ["/", "Dashboard"], ["/news", "News"], ["/calendar", "Calendar"],
-  ["/php", "PHP"], ["/exposure", "Exposure"], ["/liquidity", "Liquidity"],
-  ["/eod", "EOD"], ["/chat", "Assistant"],
-] as const;
+const GROUPS: [string, string][][] = [
+  [["/", "Dashboard"], ["/news", "News"], ["/calendar", "Calendar"], ["/php", "PHP"]],
+  [["/exposure", "Exposure"], ["/scenario", "Scenario"], ["/alerts", "Alerts"]],
+  [["/liquidity", "Liquidity"], ["/flows", "Flows"], ["/coverage", "Coverage"]],
+  [["/eod", "EOD"], ["/chat", "Assistant"]],
+];
 
 function Clock() {
   const [t, setT] = useState("");
@@ -36,24 +37,29 @@ export function Nav() {
         </Link>
 
         {/* links scroll horizontally within their own strip so the page never does */}
-        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar min-w-0 -mx-1 px-1">
-          {LINKS.map(([href, label]) => {
-            const active = path === href;
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`relative shrink-0 whitespace-nowrap px-2 sm:px-3 py-1 text-[13px] tracking-wide transition-colors duration-150 ${
-                  active ? "text-paper" : "text-muted hover:text-silver"
-                }`}
-              >
-                {label}
-                {active && (
-                  <span className="absolute -bottom-[7px] left-2 right-2 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
-                )}
-              </Link>
-            );
-          })}
+        <div className="flex items-center overflow-x-auto no-scrollbar min-w-0 -mx-1 px-1">
+          {GROUPS.map((group, gi) => (
+            <div key={gi} className="flex items-center shrink-0">
+              {gi > 0 && <span className="mx-1.5 h-4 w-px bg-border shrink-0" />}
+              {group.map(([href, label]) => {
+                const active = path === href;
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`relative shrink-0 whitespace-nowrap px-2 sm:px-2.5 py-1 text-[13px] tracking-wide transition-colors duration-150 ${
+                      active ? "text-paper" : "text-muted hover:text-silver"
+                    }`}
+                  >
+                    {label}
+                    {active && (
+                      <span className="absolute -bottom-[7px] left-2 right-2 h-px bg-gradient-to-r from-transparent via-accent to-transparent" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </div>
 
         <div className="ml-auto hidden md:flex items-center gap-4 shrink-0">

@@ -11,7 +11,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from . import intel, rates, news_feed, exposure, liquidity, chat
+from . import (intel, rates, news_feed, exposure, liquidity, chat,
+               scenario, watch, flows, coverage)
 from .db import News, CalendarEvent, Sentiment, Session
 from .seed import seed
 from .book import seed_book
@@ -28,6 +29,7 @@ _news_cache: dict[str, object] = {"at": 0.0, "items": [], "live": False}
 def _startup() -> None:
     seed()
     seed_book()
+    watch.seed_triggers()
 
 
 def _rows(model) -> list[dict]:
@@ -173,3 +175,52 @@ class ChatIn(BaseModel):
 @app.post("/chat")
 def chat_endpoint(body: ChatIn) -> dict:
     return {"answer": chat.answer(body.question)}
+
+
+# ── Phase 5: scenario, alerts, flow forecasting, coverage (all read-only) ──
+
+@app.get("/scenario")
+def scenario_endpoint() -> dict:
+    return scenario.summary()
+
+
+class ShockIn(BaseModel):
+    shocks: dict[str, float]
+
+
+@app.post("/scenario")
+def scenario_custom(body: ShockIn) -> dict:
+    return scenario.custom(body.shocks)
+
+
+@app.get("/alerts")
+def alerts_endpoint() -> dict:
+    return watch.evaluate()
+
+
+class TriggerIn(BaseModel):
+    kind: str
+    currency: str
+    op: str
+    level: float
+    note: str = ""
+
+
+@app.post("/alerts")
+def alerts_add(body: TriggerIn) -> dict:
+    return watch.add(body.kind, body.currency, body.op, body.level, body.note)
+
+
+@app.delete("/alerts/{trigger_id}")
+def alerts_remove(trigger_id: int) -> dict:
+    return watch.remove(trigger_id)
+
+
+@app.get("/flows")
+def flows_endpoint() -> dict:
+    return flows.summary()
+
+
+@app.get("/coverage")
+def coverage_endpoint() -> dict:
+    return coverage.summary()

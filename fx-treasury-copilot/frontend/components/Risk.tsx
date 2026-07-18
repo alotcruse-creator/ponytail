@@ -6,6 +6,10 @@ const TONE: Record<string, { text: string; bar: string; bg: string; ring: string
   BREACH: { text: "text-bear", bar: "bg-bear", bg: "bg-bear/10", ring: "border-bear/30" },
   TIGHT: { text: "text-flat", bar: "bg-flat", bg: "bg-flat/10", ring: "border-flat/25" },
   GAP: { text: "text-bear", bar: "bg-bear", bg: "bg-bear/10", ring: "border-bear/30" },
+  FIRED: { text: "text-bear", bar: "bg-bear", bg: "bg-bear/10", ring: "border-bear/30" },
+  ARMED: { text: "text-ash", bar: "bg-ash", bg: "bg-ash/10", ring: "border-border" },
+  UNDER: { text: "text-flat", bar: "bg-flat", bg: "bg-flat/10", ring: "border-flat/25" },
+  OVER: { text: "text-flat", bar: "bg-flat", bg: "bg-flat/10", ring: "border-flat/25" },
 };
 
 export function StatusPill({ status }: { status: string }) {

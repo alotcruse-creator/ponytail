@@ -92,5 +92,16 @@ class Balance(Base):
     updated: Mapped[str] = mapped_column(String, default="")
 
 
+class Trigger(Base):
+    """A personal watch: fire when a rate or limit crosses a level (Phase 5)."""
+    __tablename__ = "triggers"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    kind: Mapped[str] = mapped_column(String)            # rate | limit
+    currency: Mapped[str] = mapped_column(String)
+    op: Mapped[str] = mapped_column(String)             # ">=" | "<="
+    level: Mapped[float] = mapped_column(Float)
+    note: Mapped[str] = mapped_column(String, default="")
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)
