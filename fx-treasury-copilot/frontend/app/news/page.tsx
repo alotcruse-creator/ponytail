@@ -1,16 +1,21 @@
-export const dynamic = "force-dynamic";
-
+"use client";
+import { useEffect, useState } from "react";
 import { Card, Dir, Stars } from "@/components/Card";
 import { api, type News } from "@/lib/api";
 
-export default async function NewsPage() {
-  const news = await api<News[]>("/news", []);
+export default function NewsPage() {
+  const [news, setNews] = useState<News[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api<News[]>("/news", []).then((n) => { setNews(n); setLoading(false); });
+  }, []);
+
   return (
     <div className="space-y-3">
       <h1 className="text-lg font-semibold">Market News</h1>
-      {news.length === 0 && (
-        <Card><p className="text-muted text-sm">No data — backend may be starting up. Refresh in 30s.</p></Card>
-      )}
+      {loading && <Card><p className="text-muted text-sm animate-pulse">Loading — waking backend, may take up to 60s…</p></Card>}
+      {!loading && news.length === 0 && <Card><p className="text-muted text-sm">No news yet. Backend returned empty — try refreshing.</p></Card>}
       {news.map((n) => (
         <Card key={n.id}>
           <div className="flex items-start justify-between gap-4">

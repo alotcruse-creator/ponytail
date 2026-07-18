@@ -1,15 +1,11 @@
-// Single fetch point for the backend. Server components only (no client fetch).
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// Single fetch point. Works from both server and client components.
+// On free-tier Render the first wake takes ~50s — client-side fetch lets the
+// browser wait instead of hitting Vercel's 10s serverless limit.
+export const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export async function api<T>(path: string, fallback: T): Promise<T> {
-  // ponytail: no-store so the morning dashboard is always live, not a
-  // build-time snapshot. Returns fallback on any error so build never fails
-  // if the backend is unreachable (sleeping free-tier, missing env var, etc.)
   try {
-    const r = await fetch(`${BASE}${path}`, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(10000),
-    });
+    const r = await fetch(`${BASE}${path}`, { cache: "no-store" });
     if (!r.ok) return fallback;
     return r.json() as Promise<T>;
   } catch {
