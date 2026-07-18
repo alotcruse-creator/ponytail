@@ -4,8 +4,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const LINKS = [
-  ["/", "Dashboard"], ["/news", "News"],
-  ["/calendar", "Calendar"], ["/php", "PHP"], ["/eod", "EOD"],
+  ["/", "Dashboard"], ["/news", "News"], ["/calendar", "Calendar"],
+  ["/php", "PHP"], ["/exposure", "Exposure"], ["/liquidity", "Liquidity"],
+  ["/eod", "EOD"], ["/chat", "Assistant"],
 ] as const;
 
 function Clock() {

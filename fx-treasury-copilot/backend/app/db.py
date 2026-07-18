@@ -54,5 +54,43 @@ class Sentiment(Base):
     score: Mapped[int] = mapped_column(Integer)         # 0..100
 
 
+# ── The book (Phase 2+). Read-only: the app measures these, never trades them. ──
+
+class Position(Base):
+    """An open FX position. amount is in currency units; sign = direction."""
+    __tablename__ = "positions"
+    currency: Mapped[str] = mapped_column(String, primary_key=True)
+    amount: Mapped[float] = mapped_column(Float)         # + long ccy, - short ccy
+    avg_rate: Mapped[float] = mapped_column(Float)       # ccy per 1 USD, at entry
+    updated: Mapped[str] = mapped_column(String, default="")
+
+
+class Settlement(Base):
+    """A pending cash movement. amount signed: + inflow to us, - outflow."""
+    __tablename__ = "settlements"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    currency: Mapped[str] = mapped_column(String)
+    amount: Mapped[float] = mapped_column(Float)
+    direction: Mapped[str] = mapped_column(String)      # IN | OUT
+    value_date: Mapped[str] = mapped_column(String)     # ISO date
+    counterparty: Mapped[str] = mapped_column(String, default="")
+
+
+class Limit(Base):
+    """Treasury policy ceilings per currency."""
+    __tablename__ = "limits"
+    currency: Mapped[str] = mapped_column(String, primary_key=True)
+    max_exposure_usd: Mapped[float] = mapped_column(Float)   # |USD exposure| ceiling
+    liquidity_floor: Mapped[float] = mapped_column(Float)    # min ccy balance to hold
+
+
+class Balance(Base):
+    """Current cash on hand per currency (Phase 3 liquidity base)."""
+    __tablename__ = "balances"
+    currency: Mapped[str] = mapped_column(String, primary_key=True)
+    balance: Mapped[float] = mapped_column(Float)            # ccy units
+    updated: Mapped[str] = mapped_column(String, default="")
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)

@@ -88,6 +88,16 @@ def end_of_day(news, events, sentiment) -> str:
     return _ai(prompt, fallback)
 
 
+def narrate(prompt: str, fallback: str) -> str:
+    """Public narration entry point for other engines (exposure, liquidity, chat).
+
+    Same contract as the internal briefer: AI phrases the facts, deterministic
+    text ships if no provider is available. The AI never produces a number the
+    app relies on.
+    """
+    return _ai(prompt, fallback)
+
+
 def _ai(prompt: str, fallback: str) -> str:
     """Narrate the facts via the first AI provider that works.
 

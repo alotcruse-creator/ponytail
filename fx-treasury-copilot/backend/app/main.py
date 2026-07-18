@@ -9,10 +9,12 @@ from datetime import date, datetime, timedelta
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-from . import intel, rates, news_feed
+from . import intel, rates, news_feed, exposure, liquidity, chat
 from .db import News, CalendarEvent, Sentiment, Session
 from .seed import seed
+from .book import seed_book
 
 app = FastAPI(title="FX Treasury Copilot", version="0.2.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
@@ -25,6 +27,7 @@ _news_cache: dict[str, object] = {"at": 0.0, "items": [], "live": False}
 @app.on_event("startup")
 def _startup() -> None:
     seed()
+    seed_book()
 
 
 def _rows(model) -> list[dict]:
@@ -134,14 +137,8 @@ def php() -> dict:
         "news_count": len(php_news),
         "tomorrow_events": sum(1 for e in c if e.get("date") == tomorrow),
         "commentary": intel.morning_brief(n, c, s),
-        # ponytail: exposure figures are illustrative placeholders. Phase 2
-        # (Exposure Monitor) computes these from the position feed.
-        "exposure_sample": {
-            "net_exposure": "+PHP 278M", "position": "LONG",
-            "volume": "PHP 1.42B", "avg_rate": "0.07856",
-            "largest_settlement": "PHP 38M", "next_settlement": "14:30",
-            "limit_pct": 82, "liquidity_buffer": "PHP 120M",
-        },
+        # Phase 2: live PHP exposure computed from the book (was placeholder).
+        "exposure_sample": exposure.php_snapshot(),
     }
 
 
@@ -155,3 +152,24 @@ def morning_brief() -> dict:
 def end_of_day() -> dict:
     return {"report": intel.end_of_day(_news(), _rows(CalendarEvent),
                                        _rows(Sentiment))}
+
+
+# ── Phase 2–4: the book, liquidity, and the assistant (all read-only) ──
+
+@app.get("/exposure")
+def exposure_endpoint() -> dict:
+    return exposure.summary()
+
+
+@app.get("/liquidity")
+def liquidity_endpoint() -> dict:
+    return liquidity.summary()
+
+
+class ChatIn(BaseModel):
+    question: str
+
+
+@app.post("/chat")
+def chat_endpoint(body: ChatIn) -> dict:
+    return {"answer": chat.answer(body.question)}

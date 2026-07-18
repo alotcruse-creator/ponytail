@@ -72,15 +72,37 @@ all, the app returns deterministic rule-based summaries — nothing breaks.
 | PostgreSQL server | SQLite runs with zero setup | deploying — set `DATABASE_URL` to a Postgres DSN, no code change |
 | JWT auth | single-trader MVP | multi-user / deployed |
 | Docker | `uvicorn` + `next dev` is enough locally | packaging for deploy |
-| Exposure Monitor / Liquidity / Chat | Phase 2–4 | those phases; PHP exposure figures shown now are illustrative placeholders |
+| Live position feed (back-office / SFTP / API) | not yet contracted; `book.py` is the single swap point | treasury grants access — swap the literals, nothing downstream changes |
+
+## Phases
+
+| Phase | Focus | Ships |
+|---|---|---|
+| 1 | Market intelligence (outward) | news, calendar, sentiment, live rates, AI briefs |
+| 2 | Exposure Monitor (the book) | net/gross exposure, limit utilisation, settlement ladder, breach alerts |
+| 3 | Liquidity | 7-day cash-flow projection per currency, funding-gap alerts |
+| 4 | Assistant | natural-language Q&A grounded in the deterministic figures |
+
+Phases 2–4 run on sample data in `book.py` (positions / settlements / limits /
+balances). It's the single swap point for a real position feed — replace the
+literals and `exposure.py`, `liquidity.py`, and `chat.py` keep working. The
+whole system is read-only: it measures and warns, it never executes a trade.
+
+> Phase 2+ handles real position data once the live feed is wired — that's the
+> trigger to add auth (JWT), lock down CORS, and move to Postgres (`DATABASE_URL`).
 
 ## Endpoints
 
-`/news` · `/calendar` · `/php` · `/market-summary` · `/morning-brief` ·
-`/end-of-day` · `/health`
+`/news` · `/calendar` · `/php` · `/market-summary` · `/rates` · `/status` ·
+`/morning-brief` · `/end-of-day` · `/exposure` · `/liquidity` · `/chat` · `/health`
 
 ## Tests
 
 ```bash
-cd backend && python -m app.intel   # dedup / ranking / AI-fallback self-check
+cd backend
+python -m app.intel        # dedup / ranking / AI-fallback
+python -m app.news_feed    # deterministic news tagging
+python -m app.exposure     # exposure + limit-breach computation
+python -m app.liquidity    # cash-flow projection + funding gaps
+python -m app.chat         # assistant fact-routing
 ```
