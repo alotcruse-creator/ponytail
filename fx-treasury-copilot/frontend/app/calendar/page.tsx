@@ -15,7 +15,7 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-base font-semibold text-slate-100 tracking-tight mb-2">Economic Calendar — Week Ahead</h1>
+      <h1 className="font-serif text-[26px] sm:text-3xl font-normal text-paper tracking-tight mb-2">Economic Calendar — Week Ahead</h1>
 
       <Card title="AI — Top Events This Week" accentLeft>
         {loading
@@ -27,7 +27,7 @@ export default function CalendarPage() {
                   <li key={e.id} className="flex items-start gap-3 text-sm">
                     <span className="font-mono text-xs text-muted w-4 shrink-0 pt-0.5">{i + 1}.</span>
                     <div>
-                      <span className="text-slate-200">{e.event}</span>
+                      <span className="text-paper">{e.event}</span>
                       <span className="ml-2 text-xs text-muted">({e.currency})</span>
                       <span className="ml-1 text-xs text-muted">— FX impact on {e.currency}</span>
                     </div>
@@ -41,7 +41,7 @@ export default function CalendarPage() {
       {!loading && data.days.map((day) => (
         <Card key={day.date}>
           <div className="flex items-baseline justify-between mb-2">
-            <h2 className="text-sm font-semibold text-slate-100">
+            <h2 className="text-sm font-semibold text-paper">
               {day.label}
               <span className="ml-2 text-xs font-normal text-muted font-mono">{day.date}</span>
             </h2>
@@ -66,14 +66,14 @@ export default function CalendarPage() {
                 {day.events.map((e) => (
                   <tr key={e.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-2.5 pr-4 font-mono text-xs tabular-nums text-muted">{e.time}</td>
-                    <td className="py-2.5 pr-4 text-slate-300">{e.country}</td>
+                    <td className="py-2.5 pr-4 text-silver">{e.country}</td>
                     <td className="py-2.5 pr-4">
                       <span className="font-mono text-xs font-semibold text-accent border border-border rounded px-1.5 py-0.5 bg-bg">
                         {e.currency}
                       </span>
                     </td>
-                    <td className="py-2.5 pr-4 text-slate-200">{e.event}</td>
-                    <td className="py-2.5 pr-4 font-mono text-xs text-slate-300">{e.forecast || "—"}</td>
+                    <td className="py-2.5 pr-4 text-paper">{e.event}</td>
+                    <td className="py-2.5 pr-4 font-mono text-xs text-silver">{e.forecast || "—"}</td>
                     <td className="py-2.5 pr-4 font-mono text-xs text-muted">{e.previous || "—"}</td>
                     <td className="py-2.5"><Stars n={e.importance} /></td>
                   </tr>

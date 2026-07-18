@@ -3,23 +3,46 @@
 @tailwind utilities;
 
 body {
-  @apply text-slate-200;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #080c12;
-  background-image: radial-gradient(circle at 1px 1px, rgba(33, 38, 45, 0.8) 1px, transparent 1px);
-  background-size: 28px 28px;
+  text-rendering: optimizeLegibility;
+  color: #e7e3da;
+  background-color: #0a0a0c;
+  /* warm gold light from the top, deepening to ink at the edges */
+  background-image:
+    radial-gradient(130% 90% at 50% -20%, rgba(201, 169, 107, 0.07), transparent 55%),
+    radial-gradient(120% 120% at 50% 120%, rgba(0, 0, 0, 0.55), transparent 70%);
+  background-attachment: fixed;
   min-height: 100vh;
-  overflow-x: hidden;  /* nothing should scroll the page sideways on mobile */
+  overflow-x: hidden;
 }
 
-/* horizontal scroll strips (e.g. the nav) hide their scrollbar */
+/* fine film grain — the texture that reads as "expensive" rather than flat */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+body > * { position: relative; z-index: 1; }
+
+/* editorial numerals everywhere numbers matter */
+.tnum { font-variant-numeric: tabular-nums; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2732; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #c9a96b; }
+* { scrollbar-width: thin; scrollbar-color: #2a2732 transparent; }
+
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #21262d; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #8b949e; }
-
-* { scrollbar-width: thin; scrollbar-color: #21262d transparent; }
+/* hairline gold rule used under section eyebrows */
+.rule-gold {
+  background: linear-gradient(90deg, rgba(201, 169, 107, 0.5), rgba(201, 169, 107, 0));
+}

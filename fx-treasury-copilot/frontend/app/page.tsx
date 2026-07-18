@@ -43,7 +43,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-base font-semibold text-slate-100 tracking-tight">Dashboard</h1>
+        <h1 className="font-serif text-[26px] sm:text-3xl font-normal text-paper tracking-tight">Dashboard</h1>
         <span className="text-xs text-muted font-mono">
           {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
         </span>
@@ -57,7 +57,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mb-4">
               {market.sentiment.map((s) => (
                 <div key={s.currency} className="flex items-center justify-between border-b border-border py-1.5">
-                  <span className="font-mono font-semibold text-xs text-slate-300">{s.currency}</span>
+                  <span className="font-mono font-semibold text-xs text-silver">{s.currency}</span>
                   <Dir label={s.label} />
                 </div>
               ))}
@@ -76,7 +76,7 @@ export default function Dashboard() {
                   <li key={e.id} className="flex items-center justify-between py-2.5 gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <span className="font-mono text-xs text-muted tabular-nums shrink-0">{e.time}</span>
-                      <span className="text-sm text-slate-200 truncate">{e.event}</span>
+                      <span className="text-sm text-paper truncate">{e.event}</span>
                       <span className="text-xs text-muted shrink-0">({e.currency})</span>
                     </div>
                     <Stars n={e.importance} />
@@ -112,7 +112,7 @@ export default function Dashboard() {
                 ? <li className="py-3 text-sm text-muted">No headlines yet.</li>
                 : market.top_news.map((n) => (
                   <li key={n.id} className="py-2.5 flex items-start justify-between gap-3">
-                    <span className="text-sm text-slate-200 leading-snug">{n.headline}</span>
+                    <span className="text-sm text-paper leading-snug">{n.headline}</span>
                     <Dir label={n.sentiment} />
                   </li>
                 ))}
@@ -126,7 +126,7 @@ export default function Dashboard() {
                   <p className="text-xs text-muted animate-pulse font-mono">Waking backend — may take up to 60s on first load…</p>
                   <Skeleton lines={4} />
                 </div>
-              : <p className="text-sm leading-relaxed text-slate-300">{brief || "No brief available."}</p>}
+              : <p className="text-sm leading-relaxed text-silver">{brief || "No brief available."}</p>}
           </Card>
         </div>
       </div>

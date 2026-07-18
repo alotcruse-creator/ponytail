@@ -28,7 +28,7 @@ export function Freshness() {
       </span>
       <button
         onClick={() => window.location.reload()}
-        className="ml-auto font-mono text-muted hover:text-slate-200 transition-colors border border-border rounded px-2 py-0.5"
+        className="ml-auto font-mono text-muted hover:text-paper transition-colors border border-border rounded px-2 py-0.5"
       >
         ↻ refresh
       </button>

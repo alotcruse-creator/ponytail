@@ -21,7 +21,7 @@ export default function EodPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-base font-semibold text-slate-100 tracking-tight">End-of-Day Recap</h1>
+        <h1 className="font-serif text-[26px] sm:text-3xl font-normal text-paper tracking-tight">End-of-Day Recap</h1>
         <span className="text-xs text-muted font-mono">
           {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
         </span>
@@ -34,7 +34,7 @@ export default function EodPage() {
               <div className="h-3.5 bg-border/60 rounded-full animate-pulse w-4/5" />
               <div className="h-3.5 bg-border/60 rounded-full animate-pulse w-3/5" />
             </div>
-          : <p className="text-sm leading-relaxed text-slate-300">{report || "No recap available."}</p>}
+          : <p className="text-sm leading-relaxed text-silver">{report || "No recap available."}</p>}
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -44,7 +44,7 @@ export default function EodPage() {
             : <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                 {market.sentiment.map((s) => (
                   <div key={s.currency} className="flex items-center justify-between border-b border-border py-1.5">
-                    <span className="font-mono font-semibold text-xs text-slate-300">{s.currency}</span>
+                    <span className="font-mono font-semibold text-xs text-silver">{s.currency}</span>
                     <Dir label={s.label} />
                   </div>
                 ))}
@@ -59,7 +59,7 @@ export default function EodPage() {
                 ? <li className="py-3 text-sm text-muted">No drivers.</li>
                 : market.top_news.map((n) => (
                   <li key={n.id} className="py-2.5 flex items-start justify-between gap-3">
-                    <span className="text-sm text-slate-200 leading-snug">{n.headline}</span>
+                    <span className="text-sm text-paper leading-snug">{n.headline}</span>
                     <Dir label={n.sentiment} />
                   </li>
                 ))}

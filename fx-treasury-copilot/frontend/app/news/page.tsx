@@ -14,7 +14,7 @@ export default function NewsPage() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-base font-semibold text-slate-100 tracking-tight">Market News</h1>
+        <h1 className="font-serif text-[26px] sm:text-3xl font-normal text-paper tracking-tight">Market News</h1>
         {!loading && (
           <span className="text-xs font-mono text-muted">{news.length} item{news.length !== 1 ? "s" : ""}</span>
         )}
@@ -40,13 +40,13 @@ export default function NewsPage() {
                 <span className="text-xs font-mono font-semibold text-muted border border-border rounded px-1.5 py-0.5 bg-bg">
                   {n.currency}
                 </span>
-                <span className="font-semibold text-sm text-slate-100 leading-snug">{n.headline}</span>
+                <span className="font-semibold text-sm text-paper leading-snug">{n.headline}</span>
               </div>
-              <p className="text-sm text-slate-400 leading-relaxed">{n.summary}</p>
+              <p className="text-sm text-ash leading-relaxed">{n.summary}</p>
               <div className="mt-2 flex items-center gap-3 text-xs text-muted">
                 <span>{n.source}</span>
                 <span>·</span>
-                <span>Confidence <span className="text-slate-300 font-mono">{n.confidence}%</span></span>
+                <span>Confidence <span className="text-silver font-mono">{n.confidence}%</span></span>
                 {n.published_time && <span>· {n.published_time}</span>}
               </div>
             </div>
