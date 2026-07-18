@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter, IBM_Plex_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
 import { Freshness } from "@/components/Freshness";
@@ -20,6 +20,11 @@ const mono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "FX Treasury Copilot",
   description: "Morning FX market intelligence — read-only, PHP-first.",
+  appleWebApp: { capable: true, title: "FX Copilot", statusBarStyle: "black-translucent" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0c",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
