@@ -32,26 +32,48 @@ export default function PhpPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">PHP Monitor</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-base font-semibold text-slate-100 tracking-tight">PHP Monitor</h1>
+        <span className="font-mono text-xs font-semibold text-muted border border-border rounded px-2 py-0.5 bg-bg">USD/PHP</span>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card title="Sentiment">
-          <div className="flex items-center justify-between">
+        <Card title="Sentiment" accentLeft>
+          <div className="flex items-center justify-between mt-1">
             <Dir label={p.sentiment.label} />
-            <span className="text-2xl font-bold text-accent">{loading ? "…" : p.sentiment.score + "%"}</span>
+            <div>
+              <span className="text-3xl font-bold font-mono text-accent">
+                {loading ? "—" : p.sentiment.score}
+              </span>
+              <span className="text-sm text-muted ml-0.5">%</span>
+            </div>
           </div>
         </Card>
-        <Card title="Today's PHP News"><span className="text-3xl font-bold">{loading ? "…" : p.news_count}</span></Card>
-        <Card title="Tomorrow's Events"><span className="text-3xl font-bold">{loading ? "…" : p.tomorrow_events}</span></Card>
+        <Card title="PHP News Today">
+          <span className="text-3xl font-bold font-mono text-slate-100">
+            {loading ? "—" : p.news_count}
+          </span>
+          <span className="ml-2 text-sm text-muted">articles</span>
+        </Card>
+        <Card title="Tomorrow's Events">
+          <span className="text-3xl font-bold font-mono text-slate-100">
+            {loading ? "—" : p.tomorrow_events}
+          </span>
+          <span className="ml-2 text-sm text-muted">events</span>
+        </Card>
       </div>
 
       {!loading && Object.keys(p.exposure_sample).length > 0 && (
-        <Card title="Snapshot (illustrative — Phase 2 live feed)">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+        <Card title="Exposure Snapshot (Illustrative — Phase 2 live feed)">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(p.exposure_sample).map(([k, v]) => (
-              <div key={k}>
-                <div className="text-muted text-xs">{LABELS[k] ?? k}</div>
-                <div className="font-semibold">{k === "limit_pct" ? `${v}%` : v}</div>
+              <div key={k} className="space-y-0.5">
+                <div className="text-[10px] font-semibold tracking-widest text-muted uppercase">
+                  {LABELS[k] ?? k}
+                </div>
+                <div className="font-mono font-semibold text-slate-100">
+                  {k === "limit_pct" ? `${v}%` : v}
+                </div>
               </div>
             ))}
           </div>
@@ -59,30 +81,37 @@ export default function PhpPage() {
       )}
 
       <Card title="Current Drivers">
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex flex-wrap gap-1.5">
           {loading
-            ? <span className="text-muted animate-pulse">Loading…</span>
+            ? <span className="text-sm text-muted font-mono animate-pulse">Loading…</span>
             : p.drivers.length === 0
-              ? <span className="text-muted">No drivers available.</span>
-              : p.drivers.map((d) => <span key={d} className="bg-bg border border-border rounded px-2 py-1 text-muted">{d}</span>)}
+              ? <span className="text-sm text-muted">No drivers available.</span>
+              : p.drivers.map((d) => (
+                <span key={d} className="text-xs bg-bg border border-border rounded-md px-2.5 py-1 text-muted hover:text-slate-300 transition-colors">
+                  {d}
+                </span>
+              ))}
         </div>
       </Card>
 
-      <Card title="AI Commentary">
+      <Card title="AI Commentary" accentLeft>
         <p className="text-sm leading-relaxed text-slate-300">
-          {loading ? <span className="animate-pulse text-muted">Loading…</span> : p.commentary || "No commentary available."}
+          {loading
+            ? <span className="font-mono text-muted animate-pulse">Loading…</span>
+            : p.commentary || "No commentary available."}
         </p>
       </Card>
 
       <Card title="Recent PHP Headlines">
-        <ul className="text-sm divide-y divide-border">
+        <ul className="divide-y divide-border">
           {loading
-            ? <li className="py-2 text-muted animate-pulse">Loading…</li>
+            ? <li className="py-3 text-sm text-muted font-mono animate-pulse">Loading…</li>
             : p.news.length === 0
-              ? <li className="py-2 text-muted">No PHP headlines yet.</li>
+              ? <li className="py-3 text-sm text-muted">No PHP headlines yet.</li>
               : p.news.map((n) => (
-                <li key={n.id} className="py-2 flex items-center justify-between gap-3">
-                  <span>{n.headline}</span><Dir label={n.sentiment} />
+                <li key={n.id} className="py-2.5 flex items-start justify-between gap-3">
+                  <span className="text-sm text-slate-200 leading-snug">{n.headline}</span>
+                  <Dir label={n.sentiment} />
                 </li>
               ))}
         </ul>

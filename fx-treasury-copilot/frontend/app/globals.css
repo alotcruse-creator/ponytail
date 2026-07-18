@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 body {
-  @apply bg-bg text-slate-200;
+  @apply text-slate-200;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #080c12;
+  background-image: radial-gradient(circle at 1px 1px, rgba(33, 38, 45, 0.8) 1px, transparent 1px);
+  background-size: 28px 28px;
+  min-height: 100vh;
 }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #21262d; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #8b949e; }
+
+* { scrollbar-width: thin; scrollbar-color: #21262d transparent; }

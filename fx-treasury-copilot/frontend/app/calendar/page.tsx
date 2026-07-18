@@ -15,16 +15,23 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Economic Calendar</h1>
+      <h1 className="text-base font-semibold text-slate-100 tracking-tight mb-2">Economic Calendar</h1>
 
-      <Card title="AI — Today's Top Events">
+      <Card title="AI — Top Events Today" accentLeft>
         {loading
-          ? <p className="text-muted text-sm animate-pulse">Loading…</p>
+          ? <p className="text-sm text-muted font-mono animate-pulse">Loading…</p>
           : data.top5.length === 0
-            ? <p className="text-muted text-sm">No top events available.</p>
-            : <ol className="text-sm space-y-1 list-decimal list-inside">
-                {data.top5.map((e) => (
-                  <li key={e.id}>{e.event} <span className="text-muted">({e.currency})</span> — likely FX impact on {e.currency}</li>
+            ? <p className="text-sm text-muted">No top events available.</p>
+            : <ol className="space-y-2">
+                {data.top5.map((e, i) => (
+                  <li key={e.id} className="flex items-start gap-3 text-sm">
+                    <span className="font-mono text-xs text-muted w-4 shrink-0 pt-0.5">{i + 1}.</span>
+                    <div>
+                      <span className="text-slate-200">{e.event}</span>
+                      <span className="ml-2 text-xs text-muted">({e.currency})</span>
+                      <span className="ml-1 text-xs text-muted">— FX impact on {e.currency}</span>
+                    </div>
+                  </li>
                 ))}
               </ol>}
       </Card>
@@ -32,21 +39,39 @@ export default function CalendarPage() {
       <Card>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-muted text-xs uppercase">
-              <tr className="text-left">
-                <th className="py-1">Time</th><th>Country</th><th>Ccy</th>
-                <th>Event</th><th>Forecast</th><th>Previous</th><th>Impact</th>
+            <thead>
+              <tr className="text-left border-b border-border">
+                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Time</th>
+                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Country</th>
+                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Ccy</th>
+                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Event</th>
+                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Forecast</th>
+                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Previous</th>
+                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase">Impact</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading
-                ? <tr><td colSpan={7} className="py-3 text-muted text-center animate-pulse">Loading…</td></tr>
+                ? (
+                  <tr>
+                    <td colSpan={7} className="py-4 text-sm text-muted text-center font-mono animate-pulse">
+                      Loading…
+                    </td>
+                  </tr>
+                )
                 : data.events.map((e) => (
-                  <tr key={e.id}>
-                    <td className="py-2">{e.time}</td>
-                    <td>{e.country}</td><td>{e.currency}</td><td>{e.event}</td>
-                    <td>{e.forecast || "—"}</td><td>{e.previous || "—"}</td>
-                    <td><Stars n={e.importance} /></td>
+                  <tr key={e.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-2.5 pr-4 font-mono text-xs tabular-nums text-muted">{e.time}</td>
+                    <td className="py-2.5 pr-4 text-slate-300">{e.country}</td>
+                    <td className="py-2.5 pr-4">
+                      <span className="font-mono text-xs font-semibold text-accent border border-border rounded px-1.5 py-0.5 bg-bg">
+                        {e.currency}
+                      </span>
+                    </td>
+                    <td className="py-2.5 pr-4 text-slate-200">{e.event}</td>
+                    <td className="py-2.5 pr-4 font-mono text-xs text-slate-300">{e.forecast || "—"}</td>
+                    <td className="py-2.5 pr-4 font-mono text-xs text-muted">{e.previous || "—"}</td>
+                    <td className="py-2.5"><Stars n={e.importance} /></td>
                   </tr>
                 ))}
             </tbody>

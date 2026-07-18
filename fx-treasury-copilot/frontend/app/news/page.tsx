@@ -13,23 +13,46 @@ export default function NewsPage() {
 
   return (
     <div className="space-y-3">
-      <h1 className="text-lg font-semibold">Market News</h1>
-      {loading && <Card><p className="text-muted text-sm animate-pulse">Loading — waking backend, may take up to 60s…</p></Card>}
-      {!loading && news.length === 0 && <Card><p className="text-muted text-sm">No news yet. Backend returned empty — try refreshing.</p></Card>}
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-base font-semibold text-slate-100 tracking-tight">Market News</h1>
+        {!loading && (
+          <span className="text-xs font-mono text-muted">{news.length} item{news.length !== 1 ? "s" : ""}</span>
+        )}
+      </div>
+
+      {loading && (
+        <Card>
+          <p className="text-sm text-muted font-mono animate-pulse">Loading — waking backend, may take up to 60s…</p>
+        </Card>
+      )}
+      {!loading && news.length === 0 && (
+        <Card>
+          <p className="text-sm text-muted">No news yet. Backend returned empty — try refreshing.</p>
+        </Card>
+      )}
+
       {news.map((n) => (
         <Card key={n.id}>
           <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
                 <Stars n={n.importance} />
-                <span className="font-semibold">{n.headline}</span>
+                <span className="text-xs font-mono font-semibold text-muted border border-border rounded px-1.5 py-0.5 bg-bg">
+                  {n.currency}
+                </span>
+                <span className="font-semibold text-sm text-slate-100 leading-snug">{n.headline}</span>
               </div>
-              <p className="text-sm text-slate-400">{n.summary}</p>
-              <div className="mt-2 text-xs text-muted">
-                {n.source} · Affected <span className="text-slate-300">{n.currency}</span> · Confidence {n.confidence}%
+              <p className="text-sm text-slate-400 leading-relaxed">{n.summary}</p>
+              <div className="mt-2 flex items-center gap-3 text-xs text-muted">
+                <span>{n.source}</span>
+                <span>·</span>
+                <span>Confidence <span className="text-slate-300 font-mono">{n.confidence}%</span></span>
+                {n.published_time && <span>· {n.published_time}</span>}
               </div>
             </div>
-            <Dir label={n.sentiment} />
+            <div className="shrink-0">
+              <Dir label={n.sentiment} />
+            </div>
           </div>
         </Card>
       ))}

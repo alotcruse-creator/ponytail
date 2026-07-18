@@ -10,8 +10,14 @@ type Php = { sentiment: Sentiment; drivers: string[]; commentary: string };
 const EMPTY_MARKET: Market = { sentiment: [], high_impact: [], top_news: [] };
 const EMPTY_PHP: Php = { sentiment: { currency: "PHP", label: "Neutral", score: 50 }, drivers: [], commentary: "" };
 
-function Skeleton() {
-  return <div className="space-y-2">{[1,2,3].map(i=><div key={i} className="h-4 bg-border rounded animate-pulse"/>)}</div>;
+function Skeleton({ lines = 3 }: { lines?: number }) {
+  return (
+    <div className="space-y-2.5">
+      {Array.from({ length: lines }, (_, i) => (
+        <div key={i} className="h-3.5 bg-border/60 rounded-full animate-pulse" style={{ width: `${85 - i * 12}%` }} />
+      ))}
+    </div>
+  );
 }
 
 export default function Dashboard() {
@@ -29,68 +35,92 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card title="Today's Market">
-        {loading ? <Skeleton /> : <>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {market.sentiment.map((s) => (
-              <div key={s.currency} className="flex justify-between border-b border-border py-1">
-                <span className="font-semibold">{s.currency}</span>
-                <Dir label={s.label} />
-              </div>
-            ))}
-          </div>
-          {market.sentiment.length > 0 && <div className="mt-4"><SentimentChart data={market.sentiment} /></div>}
-        </>}
-      </Card>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-base font-semibold text-slate-100 tracking-tight">Dashboard</h1>
+        <span className="text-xs text-muted font-mono">
+          {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+        </span>
+      </div>
 
-      <Card title="Today's High Impact Events">
-        <ul className="text-sm divide-y divide-border">
-          {loading
-            ? <li className="py-2 text-muted animate-pulse">Loading…</li>
-            : market.high_impact.length === 0
-              ? <li className="py-2 text-muted">No high impact events today.</li>
-              : market.high_impact.map((e) => (
-                <li key={e.id} className="flex items-center justify-between py-2">
-                  <span><span className="text-muted mr-2">{e.time}</span>{e.event} <span className="text-muted">({e.currency})</span></span>
-                  <Stars n={e.importance} />
-                </li>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card title="Currency Sentiment">
+          {loading ? <Skeleton /> : <>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mb-4">
+              {market.sentiment.map((s) => (
+                <div key={s.currency} className="flex items-center justify-between border-b border-border py-1.5">
+                  <span className="font-mono font-semibold text-xs text-slate-300">{s.currency}</span>
+                  <Dir label={s.label} />
+                </div>
               ))}
-        </ul>
-      </Card>
-
-      <Card title="PHP Focus">
-        {loading ? <Skeleton /> : <>
-          <div className="flex items-center justify-between mb-2">
-            <Dir label={php.sentiment.label} />
-            <span className="text-2xl font-bold text-accent">{php.sentiment.score}%</span>
-          </div>
-          <div className="flex flex-wrap gap-2 text-xs">
-            {php.drivers.map((d) => <span key={d} className="bg-bg border border-border rounded px-2 py-1 text-muted">{d}</span>)}
-          </div>
-        </>}
-      </Card>
-
-      <Card title="Top Headlines">
-        <ul className="text-sm divide-y divide-border">
-          {loading
-            ? <li className="py-2 text-muted animate-pulse">Loading…</li>
-            : market.top_news.length === 0
-              ? <li className="py-2 text-muted">No headlines yet.</li>
-              : market.top_news.map((n) => (
-                <li key={n.id} className="py-2 flex items-center justify-between gap-2">
-                  <span>{n.headline}</span><Dir label={n.sentiment} />
-                </li>
-              ))}
-        </ul>
-      </Card>
-
-      <div className="md:col-span-2">
-        <Card title="AI Morning Brief">
-          {loading
-            ? <p className="text-sm text-muted animate-pulse">Waking backend — may take up to 60s on first load…</p>
-            : <p className="text-sm leading-relaxed text-slate-300">{brief || "No brief available."}</p>}
+            </div>
+            {market.sentiment.length > 0 && <SentimentChart data={market.sentiment} />}
+          </>}
         </Card>
+
+        <Card title="High Impact Events Today">
+          <ul className="divide-y divide-border">
+            {loading
+              ? <li className="py-3"><Skeleton lines={2} /></li>
+              : market.high_impact.length === 0
+                ? <li className="py-3 text-sm text-muted">No high impact events today.</li>
+                : market.high_impact.map((e) => (
+                  <li key={e.id} className="flex items-center justify-between py-2.5 gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="font-mono text-xs text-muted tabular-nums shrink-0">{e.time}</span>
+                      <span className="text-sm text-slate-200 truncate">{e.event}</span>
+                      <span className="text-xs text-muted shrink-0">({e.currency})</span>
+                    </div>
+                    <Stars n={e.importance} />
+                  </li>
+                ))}
+          </ul>
+        </Card>
+
+        <Card title="PHP Focus" accentLeft>
+          {loading ? <Skeleton /> : <>
+            <div className="flex items-center justify-between mb-3">
+              <Dir label={php.sentiment.label} />
+              <div className="text-right">
+                <span className="text-3xl font-bold font-mono text-accent">{php.sentiment.score}</span>
+                <span className="text-sm text-muted ml-0.5">%</span>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {php.drivers.length === 0
+                ? <span className="text-xs text-muted">No drivers.</span>
+                : php.drivers.map((d) => (
+                  <span key={d} className="text-xs bg-bg border border-border rounded-md px-2 py-0.5 text-muted">{d}</span>
+                ))}
+            </div>
+          </>}
+        </Card>
+
+        <Card title="Top Headlines">
+          <ul className="divide-y divide-border">
+            {loading
+              ? <li className="py-3"><Skeleton lines={2} /></li>
+              : market.top_news.length === 0
+                ? <li className="py-3 text-sm text-muted">No headlines yet.</li>
+                : market.top_news.map((n) => (
+                  <li key={n.id} className="py-2.5 flex items-start justify-between gap-3">
+                    <span className="text-sm text-slate-200 leading-snug">{n.headline}</span>
+                    <Dir label={n.sentiment} />
+                  </li>
+                ))}
+          </ul>
+        </Card>
+
+        <div className="md:col-span-2">
+          <Card title="AI Morning Brief" accentLeft>
+            {loading
+              ? <div className="space-y-2">
+                  <p className="text-xs text-muted animate-pulse font-mono">Waking backend — may take up to 60s on first load…</p>
+                  <Skeleton lines={4} />
+                </div>
+              : <p className="text-sm leading-relaxed text-slate-300">{brief || "No brief available."}</p>}
+          </Card>
+        </div>
       </div>
     </div>
   );
