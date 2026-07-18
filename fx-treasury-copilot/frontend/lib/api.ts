@@ -1,7 +1,7 @@
 // Single fetch point. Works from both server and client components.
 // On free-tier Render the first wake takes ~50s — client-side fetch lets the
 // browser wait instead of hitting Vercel's 10s serverless limit.
-export const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://fx-backend-yrpw.onrender.com";
 
 export async function api<T>(path: string, fallback: T): Promise<T> {
   try {
