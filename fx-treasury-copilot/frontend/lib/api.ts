@@ -14,12 +14,19 @@ export async function api<T>(path: string, fallback: T): Promise<T> {
 }
 
 export type News = {
-  id: number; headline: string; summary: string; source: string;
+  id: number; headline: string; summary: string; source: string; url?: string;
   currency: string; sentiment: string; importance: number; confidence: number;
   published_time: string;
 };
 export type Event = {
-  id: number; event: string; country: string; currency: string; time: string;
+  id: number; event: string; country: string; currency: string;
+  date?: string; time: string;
   forecast: string; previous: string; actual: string; importance: number;
 };
 export type Sentiment = { currency: string; label: string; score: number };
+
+export type Rate = { pair: string; currency: string; rate: number; date: string | null };
+export type RatePoint = { date: string; rate: number };
+export type RatesSnapshot = { rates: Rate[]; php_history: RatePoint[]; as_of: string | null };
+export type CalendarDay = { date: string; weekday: string; label: string; events: Event[] };
+export type Status = { generated_at: string; news_live: boolean; rates_as_of: string | null };

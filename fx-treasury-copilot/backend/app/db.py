@@ -39,6 +39,7 @@ class CalendarEvent(Base):
     event: Mapped[str] = mapped_column(String)
     country: Mapped[str] = mapped_column(String)
     currency: Mapped[str] = mapped_column(String)
+    date: Mapped[str] = mapped_column(String, default="")  # ISO "2026-07-18"
     time: Mapped[str] = mapped_column(String)           # "20:30" local
     forecast: Mapped[str] = mapped_column(String, default="")
     previous: Mapped[str] = mapped_column(String, default="")

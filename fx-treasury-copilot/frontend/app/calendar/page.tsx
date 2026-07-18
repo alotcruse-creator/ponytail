@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Card, Stars } from "@/components/Card";
-import { api, type Event } from "@/lib/api";
+import { api, type Event, type CalendarDay } from "@/lib/api";
 
-const EMPTY = { events: [] as Event[], top5: [] as Event[] };
+const EMPTY = { events: [] as Event[], days: [] as CalendarDay[], top5: [] as Event[] };
 
 export default function CalendarPage() {
   const [data, setData] = useState(EMPTY);
@@ -15,9 +15,9 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-base font-semibold text-slate-100 tracking-tight mb-2">Economic Calendar</h1>
+      <h1 className="text-base font-semibold text-slate-100 tracking-tight mb-2">Economic Calendar — Week Ahead</h1>
 
-      <Card title="AI — Top Events Today" accentLeft>
+      <Card title="AI — Top Events This Week" accentLeft>
         {loading
           ? <p className="text-sm text-muted font-mono animate-pulse">Loading…</p>
           : data.top5.length === 0
@@ -36,30 +36,34 @@ export default function CalendarPage() {
               </ol>}
       </Card>
 
-      <Card>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b border-border">
-                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Time</th>
-                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Country</th>
-                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Ccy</th>
-                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Event</th>
-                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Forecast</th>
-                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Previous</th>
-                <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase">Impact</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {loading
-                ? (
-                  <tr>
-                    <td colSpan={7} className="py-4 text-sm text-muted text-center font-mono animate-pulse">
-                      Loading…
-                    </td>
-                  </tr>
-                )
-                : data.events.map((e) => (
+      {loading && <Card><p className="text-sm text-muted font-mono animate-pulse">Loading week…</p></Card>}
+
+      {!loading && data.days.map((day) => (
+        <Card key={day.date}>
+          <div className="flex items-baseline justify-between mb-2">
+            <h2 className="text-sm font-semibold text-slate-100">
+              {day.label}
+              <span className="ml-2 text-xs font-normal text-muted font-mono">{day.date}</span>
+            </h2>
+            <span className="text-[10px] font-mono text-muted uppercase tracking-widest">
+              {day.events.length} event{day.events.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left border-b border-border">
+                  <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Time</th>
+                  <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Country</th>
+                  <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Ccy</th>
+                  <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Event</th>
+                  <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Forecast</th>
+                  <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase pr-4">Previous</th>
+                  <th className="pb-2 text-[10px] font-semibold tracking-widest text-muted uppercase">Impact</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {day.events.map((e) => (
                   <tr key={e.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-2.5 pr-4 font-mono text-xs tabular-nums text-muted">{e.time}</td>
                     <td className="py-2.5 pr-4 text-slate-300">{e.country}</td>
@@ -74,10 +78,11 @@ export default function CalendarPage() {
                     <td className="py-2.5"><Stars n={e.importance} /></td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 }

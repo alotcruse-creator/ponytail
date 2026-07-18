@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 const LINKS = [
   ["/", "Dashboard"], ["/news", "News"],
-  ["/calendar", "Calendar"], ["/php", "PHP"],
+  ["/calendar", "Calendar"], ["/php", "PHP"], ["/eod", "EOD"],
 ] as const;
 
 function Clock() {

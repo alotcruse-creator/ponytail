@@ -2,13 +2,15 @@
 import { useEffect, useState } from "react";
 import { Card, Dir, Stars } from "@/components/Card";
 import { SentimentChart } from "@/components/SentimentChart";
-import { api, type Event, type News, type Sentiment } from "@/lib/api";
+import { Rates } from "@/components/Rates";
+import { api, type Event, type News, type Sentiment, type RatesSnapshot } from "@/lib/api";
 
 type Market = { sentiment: Sentiment[]; high_impact: Event[]; top_news: News[] };
 type Php = { sentiment: Sentiment; drivers: string[]; commentary: string };
 
 const EMPTY_MARKET: Market = { sentiment: [], high_impact: [], top_news: [] };
 const EMPTY_PHP: Php = { sentiment: { currency: "PHP", label: "Neutral", score: 50 }, drivers: [], commentary: "" };
+const EMPTY_RATES: RatesSnapshot = { rates: [], php_history: [], as_of: null };
 
 function Skeleton({ lines = 3 }: { lines?: number }) {
   return (
@@ -23,6 +25,7 @@ function Skeleton({ lines = 3 }: { lines?: number }) {
 export default function Dashboard() {
   const [market, setMarket] = useState<Market>(EMPTY_MARKET);
   const [php, setPhp] = useState<Php>(EMPTY_PHP);
+  const [rates, setRates] = useState<RatesSnapshot>(EMPTY_RATES);
   const [brief, setBrief] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -30,8 +33,11 @@ export default function Dashboard() {
     Promise.all([
       api<Market>("/market-summary", EMPTY_MARKET),
       api<Php>("/php", EMPTY_PHP),
+      api<RatesSnapshot>("/rates", EMPTY_RATES),
       api<{ brief: string }>("/morning-brief", { brief: "" }),
-    ]).then(([m, p, b]) => { setMarket(m); setPhp(p); setBrief(b.brief); setLoading(false); });
+    ]).then(([m, p, r, b]) => {
+      setMarket(m); setPhp(p); setRates(r); setBrief(b.brief); setLoading(false);
+    });
   }, []);
 
   return (
@@ -42,6 +48,8 @@ export default function Dashboard() {
           {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
         </span>
       </div>
+
+      <Rates snap={rates} loading={loading} />
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Currency Sentiment">

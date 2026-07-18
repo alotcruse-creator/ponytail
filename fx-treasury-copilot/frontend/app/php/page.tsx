@@ -1,17 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Card, Dir } from "@/components/Card";
-import { api, type News, type Sentiment } from "@/lib/api";
+import { api, type News, type Sentiment, type Rate } from "@/lib/api";
 
 type Php = {
-  sentiment: Sentiment; drivers: string[]; news: News[]; news_count: number;
-  tomorrow_events: number; commentary: string;
+  sentiment: Sentiment; rate: Rate | null; drivers: string[]; news: News[];
+  news_count: number; tomorrow_events: number; commentary: string;
   exposure_sample: Record<string, string | number>;
 };
 
 const EMPTY_PHP: Php = {
   sentiment: { currency: "PHP", label: "Neutral", score: 50 },
-  drivers: [], news: [], news_count: 0, tomorrow_events: 0,
+  rate: null, drivers: [], news: [], news_count: 0, tomorrow_events: 0,
   commentary: "", exposure_sample: {},
 };
 
@@ -49,11 +49,17 @@ export default function PhpPage() {
             </div>
           </div>
         </Card>
-        <Card title="PHP News Today">
-          <span className="text-3xl font-bold font-mono text-slate-100">
-            {loading ? "—" : p.news_count}
-          </span>
-          <span className="ml-2 text-sm text-muted">articles</span>
+        <Card title="USD / PHP">
+          {loading ? (
+            <span className="text-3xl font-bold font-mono text-slate-100">—</span>
+          ) : p.rate ? (
+            <>
+              <span className="text-3xl font-bold font-mono text-slate-100">{p.rate.rate.toFixed(4)}</span>
+              <div className="text-xs text-muted mt-1">ECB ref {p.rate.date ?? ""}</div>
+            </>
+          ) : (
+            <span className="text-sm text-muted">Rate feed unavailable</span>
+          )}
         </Card>
         <Card title="Tomorrow's Events">
           <span className="text-3xl font-bold font-mono text-slate-100">

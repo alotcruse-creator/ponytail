@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
+import { Freshness } from "@/components/Freshness";
 
 export const metadata: Metadata = {
   title: "FX Treasury Copilot",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <Nav />
+        <Freshness />
         <main className="max-w-6xl mx-auto px-4 py-6">{children}</main>
       </body>
     </html>

@@ -1,0 +1,4 @@
+
+# local build/runtime artifacts
+*.db
+tsconfig.tsbuildinfo
