@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 
 const GROUPS: [string, string][][] = [
-  [["/", "Dashboard"], ["/news", "News"], ["/calendar", "Calendar"], ["/php", "PHP"]],
+  [["/", "Dashboard"], ["/markets", "Markets"], ["/news", "News"], ["/calendar", "Calendar"], ["/php", "PHP"]],
   [["/exposure", "Exposure"], ["/scenario", "Scenario"], ["/alerts", "Alerts"]],
   [["/liquidity", "Liquidity"], ["/flows", "Flows"], ["/coverage", "Coverage"]],
   [["/eod", "EOD"], ["/chat", "Assistant"]],

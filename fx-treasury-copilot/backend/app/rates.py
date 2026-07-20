@@ -70,5 +70,52 @@ def snapshot() -> dict:
     return {"rates": rows, "php_history": php, "as_of": as_of}
 
 
+# ── Full board: every currency the ECB reference feed publishes ──
+
+CCY_NAMES = {
+    "EUR": "Euro", "JPY": "Japanese Yen", "GBP": "British Pound",
+    "CHF": "Swiss Franc", "AUD": "Australian Dollar", "CAD": "Canadian Dollar",
+    "NZD": "New Zealand Dollar", "CNY": "Chinese Yuan", "HKD": "Hong Kong Dollar",
+    "SGD": "Singapore Dollar", "PHP": "Philippine Peso", "INR": "Indian Rupee",
+    "IDR": "Indonesian Rupiah", "KRW": "South Korean Won", "MYR": "Malaysian Ringgit",
+    "THB": "Thai Baht", "MXN": "Mexican Peso", "BRL": "Brazilian Real",
+    "ZAR": "South African Rand", "TRY": "Turkish Lira", "ILS": "Israeli Shekel",
+    "SEK": "Swedish Krona", "NOK": "Norwegian Krone", "DKK": "Danish Krone",
+    "PLN": "Polish Zloty", "CZK": "Czech Koruna", "HUF": "Hungarian Forint",
+    "RON": "Romanian Leu", "BGN": "Bulgarian Lev", "ISK": "Icelandic Krona",
+}
+# PHP first (the book's focus), then the majors, then everything else.
+_PRIORITY = ["PHP", "EUR", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY",
+             "HKD", "SGD"]
+ALL_CCYS = sorted(CCY_NAMES)
+
+
+def all_snapshot(days: int = 30) -> dict:
+    """Latest USD rate, 1-day change, and a 30-day trend for every currency."""
+    def build() -> dict:
+        end = time.strftime("%Y-%m-%d")
+        start = time.strftime("%Y-%m-%d", time.gmtime(time.time() - (days + 12) * 86400))
+        d = _get(f"{BASE_URL}/{start}..{end}?base=USD&symbols={','.join(ALL_CCYS)}")
+        by_date = d.get("rates", {})
+        dates = sorted(by_date)
+        rows = []
+        for c in ALL_CCYS:
+            pts = [{"date": dt, "rate": by_date[dt][c]} for dt in dates if c in by_date[dt]]
+            if not pts:
+                continue
+            rate = pts[-1]["rate"]
+            prev = pts[-2]["rate"] if len(pts) >= 2 else rate
+            chg = (rate - prev) / prev * 100 if prev else 0.0
+            rows.append({
+                "pair": f"USD/{c}", "currency": c, "name": CCY_NAMES.get(c, c),
+                "rate": rate, "prev": prev, "change_pct": round(chg, 3),
+                "series": pts[-days:],
+            })
+        order = {c: i for i, c in enumerate(_PRIORITY)}
+        rows.sort(key=lambda r: (order.get(r["currency"], 999), r["currency"]))
+        return {"as_of": dates[-1] if dates else None, "rates": rows}
+    return _cached(f"all:{days}", build) or {"as_of": None, "rates": []}
+
+
 if __name__ == "__main__":  # manual smoke test
     print(json.dumps(snapshot(), indent=2))

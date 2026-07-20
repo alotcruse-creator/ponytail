@@ -136,6 +136,11 @@ def rates_endpoint() -> dict:
     return rates.snapshot()
 
 
+@app.get("/rates/all")
+def rates_all() -> dict:
+    return rates.all_snapshot()
+
+
 @app.get("/calendar")
 def calendar() -> dict:
     events = sorted(_rows(CalendarEvent), key=lambda e: (e.get("date") or "", e["time"]))

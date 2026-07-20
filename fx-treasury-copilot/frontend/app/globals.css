@@ -42,6 +42,11 @@ body > * { position: relative; z-index: 1; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
+/* ticker tape */
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 80s linear infinite; }
+.animate-marquee:hover { animation-play-state: paused; }
+
 /* hairline gold rule used under section eyebrows */
 .rule-gold {
   background: linear-gradient(90deg, rgba(201, 169, 107, 0.5), rgba(201, 169, 107, 0));
