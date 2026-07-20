@@ -86,8 +86,8 @@ export type Rate = { pair: string; currency: string; rate: number; date: string 
 export type RatePoint = { date: string; rate: number };
 export type RatesSnapshot = { rates: Rate[]; php_history: RatePoint[]; as_of: string | null };
 export type MarketRate = {
-  pair: string; currency: string; name: string; rate: number; prev: number;
-  change_pct: number; series: RatePoint[];
+  pair: string; currency: string; name: string; rate: number; prev?: number;
+  change_pct: number | null; series: RatePoint[];
 };
 export type MarketsAll = { as_of: string | null; rates: MarketRate[] };
 export type CalendarDay = { date: string; weekday: string; label: string; events: Event[] };

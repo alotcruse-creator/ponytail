@@ -58,7 +58,7 @@ export default function MarketsPage() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filtered.map((r) => {
-                    const up = r.change_pct >= 0;
+                    const up = (r.change_pct ?? 0) >= 0;
                     return (
                       <tr key={r.currency} className="hover:bg-white/[0.02] transition-colors">
                         <td className="py-2.5 pr-4">
@@ -66,11 +66,11 @@ export default function MarketsPage() {
                         </td>
                         <td className="py-2.5 pr-4 text-silver whitespace-nowrap">{r.name}</td>
                         <td className="py-2.5 pr-4 font-mono text-paper tnum whitespace-nowrap">{fmt(r.rate)}</td>
-                        <td className={`py-2.5 pr-4 font-mono text-xs tnum whitespace-nowrap ${up ? "text-bull" : "text-bear"}`}>
-                          {up ? "▲" : "▼"} {Math.abs(r.change_pct).toFixed(2)}%
+                        <td className={`py-2.5 pr-4 font-mono text-xs tnum whitespace-nowrap ${r.change_pct === null ? "text-ash" : up ? "text-bull" : "text-bear"}`}>
+                          {r.change_pct === null ? "—" : `${up ? "▲" : "▼"} ${Math.abs(r.change_pct).toFixed(2)}%`}
                         </td>
                         <td className="py-2.5">
-                          <Sparkline data={r.series} width={90} height={26} />
+                          {r.series.length >= 2 ? <Sparkline data={r.series} width={90} height={26} /> : <span className="text-ash text-xs">—</span>}
                         </td>
                       </tr>
                     );
@@ -84,7 +84,7 @@ export default function MarketsPage() {
           </Card>
 
           <p className="text-[10px] text-ash">
-            USD/XXX = units of that currency per 1 USD, so a rise means the currency weakened against the dollar. ECB daily reference rates, not intraday.
+            USD/XXX = units of that currency per 1 USD (a rise = the currency weakened vs the dollar). 160+ currencies, daily. 1-day change and 30-day trend are shown for the major pairs.
           </p>
         </>
       )}

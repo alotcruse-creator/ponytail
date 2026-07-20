@@ -138,7 +138,7 @@ def rates_endpoint() -> dict:
 
 @app.get("/rates/all")
 def rates_all() -> dict:
-    return rates.all_snapshot()
+    return rates.world_snapshot()
 
 
 @app.get("/calendar")

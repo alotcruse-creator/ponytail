@@ -25,10 +25,10 @@ def _get(url: str) -> dict:
         return json.loads(r.read().decode())
 
 
-def _cached(key: str, build):
+def _cached(key: str, build, ttl: int | None = None):
     hit = _cache.get(key)
     now = time.monotonic()
-    if hit and now - hit[0] < _TTL:
+    if hit and now - hit[0] < (ttl if ttl is not None else _TTL):
         return hit[1]
     try:
         val = build()
@@ -115,6 +115,52 @@ def all_snapshot(days: int = 30) -> dict:
         rows.sort(key=lambda r: (order.get(r["currency"], 999), r["currency"]))
         return {"as_of": dates[-1] if dates else None, "rates": rows}
     return _cached(f"all:{days}", build) or {"as_of": None, "rates": []}
+
+
+# ── World board: every fiat currency (~160) from a no-key feed ──
+
+# open.er-api = free ExchangeRate-API tier, ~161 fiat currencies, USD base,
+# daily, no key. Names come from a separate free list. Both are wrapped so a
+# failure falls back to the ECB majors board — the page never breaks.
+WORLD_URL = "https://open.er-api.com/v6/latest/USD"
+NAMES_URL = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.min.json"
+
+
+def _names() -> dict:
+    def build() -> dict:
+        d = _get(NAMES_URL)
+        return {k.upper(): v for k, v in d.items() if isinstance(v, str)}
+    return _cached("names", build, ttl=86400) or {}
+
+
+def world_snapshot() -> dict:
+    """Every fiat currency vs USD. Majors also carry 1-day change + 30d trend."""
+    def build() -> dict:
+        d = _get(WORLD_URL)
+        rates = d.get("rates", {})
+        if not rates:
+            raise ValueError("empty world feed")
+        names = _names()
+        majors = {r["currency"]: r for r in all_snapshot()["rates"]}
+        ts = d.get("time_last_update_unix")
+        as_of = time.strftime("%Y-%m-%d", time.gmtime(ts)) if ts else None
+        rows = []
+        for code, rate in rates.items():
+            if code == "USD":
+                continue
+            m = majors.get(code)
+            rows.append({
+                "pair": f"USD/{code}", "currency": code,
+                "name": names.get(code, code),
+                "rate": rate,
+                "change_pct": m["change_pct"] if m else None,
+                "series": m["series"] if m else [],
+            })
+        order = {c: i for i, c in enumerate(_PRIORITY)}
+        rows.sort(key=lambda r: (order.get(r["currency"], 999), r["currency"]))
+        return {"as_of": as_of, "rates": rows}
+    # Fall back to the ECB majors board if the world feed is unreachable.
+    return _cached("world", build, ttl=900) or all_snapshot()
 
 
 if __name__ == "__main__":  # manual smoke test
