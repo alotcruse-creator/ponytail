@@ -1,16 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import { api, clearToken, type Status } from "@/lib/api";
+import { clearToken, type Status } from "@/lib/api";
+import { useLive } from "@/lib/live";
 
 const EMPTY: Status = { generated_at: "", news_live: false, rates_as_of: null };
 
 export function Freshness() {
-  const [s, setS] = useState<Status>(EMPTY);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<Status>("/status", EMPTY).then((d) => { setS(d); setLoading(false); });
-  }, []);
+  const { data: s, loading } = useLive<Status>("/status", EMPTY);
 
   const time = s.generated_at
     ? new Date(s.generated_at).toLocaleString("en-US", {
@@ -20,7 +15,13 @@ export function Freshness() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 flex items-center gap-3 py-1.5 text-[11px] text-muted border-b border-border/60">
-      <span className="font-mono">{loading ? "syncing…" : `data as of ${time}`}</span>
+      <span className="inline-flex items-center gap-1.5">
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-bull opacity-70" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-bull" />
+        </span>
+        <span className="font-mono">{loading ? "syncing…" : `live · ${time}`}</span>
+      </span>
       <span className="hidden sm:inline text-border">|</span>
       <span className={`hidden sm:inline-flex items-center gap-1 ${s.news_live ? "text-bull" : "text-flat"}`}>
         <span className={`h-1.5 w-1.5 rounded-full ${s.news_live ? "bg-bull" : "bg-flat"}`} />

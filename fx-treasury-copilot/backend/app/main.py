@@ -38,7 +38,7 @@ async def _auth_gate(request, call_next):
                                 headers={"Access-Control-Allow-Origin": "*"})
     return await call_next(request)
 
-_NEWS_TTL = 900  # 15 min; RSS updates roughly this often
+_NEWS_TTL = 90  # short so the UI surfaces new headlines within ~1–2 min
 _news_cache: dict[str, object] = {"at": 0.0, "items": [], "live": False}
 
 

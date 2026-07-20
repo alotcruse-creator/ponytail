@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card, Dir } from "@/components/Card";
-import { api, type News, type Sentiment, type Rate } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type News, type Sentiment, type Rate } from "@/lib/api";
 
 type Php = {
   sentiment: Sentiment; rate: Rate | null; drivers: string[]; news: News[];
@@ -23,12 +23,7 @@ const LABELS: Record<string, string> = {
 };
 
 export default function PhpPage() {
-  const [p, setP] = useState<Php>(EMPTY_PHP);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<Php>("/php", EMPTY_PHP).then((data) => { setP(data); setLoading(false); });
-  }, []);
+  const { data: p, loading } = useLive<Php>("/php", EMPTY_PHP);
 
   return (
     <div className="space-y-4">

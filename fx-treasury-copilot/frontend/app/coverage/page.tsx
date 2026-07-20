@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card } from "@/components/Card";
 import { StatusPill, LimitBar } from "@/components/Risk";
-import { api, type Coverage } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type Coverage } from "@/lib/api";
 
 const EMPTY: Coverage = {
   cover_days: 7, target_low: 60, target_high: 90, as_of: "",
@@ -10,12 +10,7 @@ const EMPTY: Coverage = {
 };
 
 export default function CoveragePage() {
-  const [d, setD] = useState<Coverage>(EMPTY);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<Coverage>("/coverage", EMPTY).then((x) => { setD(x); setLoading(false); });
-  }, []);
+  const { data: d, loading } = useLive<Coverage>("/coverage", EMPTY);
 
   return (
     <div className="space-y-4">

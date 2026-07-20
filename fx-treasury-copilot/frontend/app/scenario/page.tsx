@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/Card";
-import { api, post, type Scenario, type CustomShock } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { post, type Scenario, type CustomShock } from "@/lib/api";
 
 const EMPTY: Scenario = {
   as_of: "", sensitivities: [],
@@ -15,15 +16,10 @@ function usd(n: number) {
 }
 
 export default function ScenarioPage() {
-  const [d, setD] = useState<Scenario>(EMPTY);
-  const [loading, setLoading] = useState(true);
+  const { data: d, loading } = useLive<Scenario>("/scenario", EMPTY);
   const [shocks, setShocks] = useState<Record<string, number>>({});
   const [result, setResult] = useState<CustomShock | null>(null);
   const [running, setRunning] = useState(false);
-
-  useEffect(() => {
-    api<Scenario>("/scenario", EMPTY).then((x) => { setD(x); setLoading(false); });
-  }, []);
 
   async function run() {
     const active = Object.fromEntries(Object.entries(shocks).filter(([, v]) => v));

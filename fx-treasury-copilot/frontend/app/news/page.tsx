@@ -1,15 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card, Dir, Stars } from "@/components/Card";
-import { api, type News } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type News } from "@/lib/api";
 
 export default function NewsPage() {
-  const [news, setNews] = useState<News[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<News[]>("/news", []).then((n) => { setNews(n); setLoading(false); });
-  }, []);
+  const { data: news, loading } = useLive<News[]>("/news", []);
 
   return (
     <div className="space-y-3">

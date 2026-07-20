@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/Card";
 import { Ticker } from "@/components/Ticker";
 import { Sparkline } from "@/components/Sparkline";
-import { api, type MarketsAll } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type MarketsAll } from "@/lib/api";
 
 const EMPTY: MarketsAll = { as_of: null, rates: [] };
 
@@ -12,13 +13,8 @@ function fmt(n: number): string {
 }
 
 export default function MarketsPage() {
-  const [d, setD] = useState<MarketsAll>(EMPTY);
-  const [loading, setLoading] = useState(true);
+  const { data: d, loading } = useLive<MarketsAll>("/rates/all", EMPTY);
   const [q, setQ] = useState("");
-
-  useEffect(() => {
-    api<MarketsAll>("/rates/all", EMPTY).then((x) => { setD(x); setLoading(false); });
-  }, []);
 
   const filtered = useMemo(() => {
     const s = q.trim().toUpperCase();

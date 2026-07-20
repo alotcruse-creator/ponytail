@@ -15,7 +15,7 @@ import json
 BASE_URL = "https://api.frankfurter.dev/v1"
 # USD is the book's quote base; PHP first because it is the largest exposure.
 PAIRS = ["PHP", "JPY", "EUR", "GBP", "CNY", "MYR"]
-_TTL = 600  # seconds; ECB updates at most once a weekday
+_TTL = 120  # seconds; ECB posts daily, but refresh promptly when it does
 _cache: dict[str, tuple[float, object]] = {}
 
 

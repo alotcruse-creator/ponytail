@@ -4,6 +4,7 @@ import { Card, Dir, Stars } from "@/components/Card";
 import { SentimentChart } from "@/components/SentimentChart";
 import { Rates } from "@/components/Rates";
 import { api, type Event, type News, type Sentiment, type RatesSnapshot } from "@/lib/api";
+import { REFRESH_MS } from "@/lib/live";
 
 type Market = { sentiment: Sentiment[]; high_impact: Event[]; top_news: News[] };
 type Php = { sentiment: Sentiment; drivers: string[]; commentary: string };
@@ -11,6 +12,7 @@ type Php = { sentiment: Sentiment; drivers: string[]; commentary: string };
 const EMPTY_MARKET: Market = { sentiment: [], high_impact: [], top_news: [] };
 const EMPTY_PHP: Php = { sentiment: { currency: "PHP", label: "Neutral", score: 50 }, drivers: [], commentary: "" };
 const EMPTY_RATES: RatesSnapshot = { rates: [], php_history: [], as_of: null };
+const EMPTY_BRIEF = { brief: "" };
 
 function Skeleton({ lines = 3 }: { lines?: number }) {
   return (
@@ -30,14 +32,23 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
+    let alive = true;
+    const load = () => Promise.all([
       api<Market>("/market-summary", EMPTY_MARKET),
       api<Php>("/php", EMPTY_PHP),
       api<RatesSnapshot>("/rates", EMPTY_RATES),
-      api<{ brief: string }>("/morning-brief", { brief: "" }),
+      api<{ brief: string }>("/morning-brief", EMPTY_BRIEF),
     ]).then(([m, p, r, b]) => {
-      setMarket(m); setPhp(p); setRates(r); setBrief(b.brief); setLoading(false);
+      if (!alive) return;
+      if (m !== EMPTY_MARKET) setMarket(m);
+      if (p !== EMPTY_PHP) setPhp(p);
+      if (r !== EMPTY_RATES) setRates(r);
+      if (b !== EMPTY_BRIEF) setBrief(b.brief);
+      setLoading(false);
     });
+    load();
+    const id = setInterval(load, REFRESH_MS);
+    return () => { alive = false; clearInterval(id); };
   }, []);
 
   return (

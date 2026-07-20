@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card } from "@/components/Card";
 import { StatusPill, LimitBar, AlertBanner } from "@/components/Risk";
-import { api, type Exposure } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type Exposure } from "@/lib/api";
 
 const EMPTY: Exposure = {
   base: "USD", as_of: "", positions: [],
@@ -11,12 +11,7 @@ const EMPTY: Exposure = {
 };
 
 export default function ExposurePage() {
-  const [d, setD] = useState<Exposure>(EMPTY);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<Exposure>("/exposure", EMPTY).then((x) => { setD(x); setLoading(false); });
-  }, []);
+  const { data: d, loading } = useLive<Exposure>("/exposure", EMPTY);
 
   return (
     <div className="space-y-4">

@@ -1,21 +1,16 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card } from "@/components/Card";
 import { StatusPill, AlertBanner } from "@/components/Risk";
 import { Sparkline } from "@/components/Sparkline";
-import { api, type Liquidity } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type Liquidity } from "@/lib/api";
 
 const EMPTY: Liquidity = {
   base_horizon_days: 7, as_of: "", currencies: [], alerts: [], commentary: "",
 };
 
 export default function LiquidityPage() {
-  const [d, setD] = useState<Liquidity>(EMPTY);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<Liquidity>("/liquidity", EMPTY).then((x) => { setD(x); setLoading(false); });
-  }, []);
+  const { data: d, loading } = useLive<Liquidity>("/liquidity", EMPTY);
 
   return (
     <div className="space-y-4">

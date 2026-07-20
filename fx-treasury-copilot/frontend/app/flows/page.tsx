@@ -1,18 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card } from "@/components/Card";
 import { Sparkline } from "@/components/Sparkline";
-import { api, type Flows } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type Flows } from "@/lib/api";
 
 const EMPTY: Flows = { horizon_days: 14, as_of: "", corridors: [], commentary: "" };
 
 export default function FlowsPage() {
-  const [d, setD] = useState<Flows>(EMPTY);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<Flows>("/flows", EMPTY).then((x) => { setD(x); setLoading(false); });
-  }, []);
+  const { data: d, loading } = useLive<Flows>("/flows", EMPTY);
 
   return (
     <div className="space-y-4">

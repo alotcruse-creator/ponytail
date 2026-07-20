@@ -1,17 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card, Stars } from "@/components/Card";
-import { api, type Event, type CalendarDay } from "@/lib/api";
+import { useLive } from "@/lib/live";
+import { type Event, type CalendarDay } from "@/lib/api";
 
 const EMPTY = { events: [] as Event[], days: [] as CalendarDay[], top5: [] as Event[] };
 
 export default function CalendarPage() {
-  const [data, setData] = useState(EMPTY);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api<typeof EMPTY>("/calendar", EMPTY).then((d) => { setData(d); setLoading(false); });
-  }, []);
+  const { data, loading } = useLive<typeof EMPTY>("/calendar", EMPTY);
 
   return (
     <div className="space-y-4">

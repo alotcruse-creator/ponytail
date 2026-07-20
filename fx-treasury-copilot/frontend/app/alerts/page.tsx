@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/Card";
 import { StatusPill } from "@/components/Risk";
 import { api, post, BASE, type Alerts, type Trigger } from "@/lib/api";
+import { REFRESH_MS } from "@/lib/live";
 
 const EMPTY: Alerts = { triggers: [], fired: 0, total: 0 };
 
@@ -11,8 +12,12 @@ export default function AlertsPage() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ kind: "rate", currency: "PHP", op: ">=", level: "", note: "" });
 
-  const load = () => api<Alerts>("/alerts", EMPTY).then((x) => { setD(x); setLoading(false); });
-  useEffect(() => { load(); }, []);
+  const load = () => api<Alerts>("/alerts", EMPTY).then((x) => { if (x !== EMPTY) setD(x); setLoading(false); });
+  useEffect(() => {
+    load();
+    const id = setInterval(load, REFRESH_MS);
+    return () => clearInterval(id);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function add() {
     if (!form.level) return;

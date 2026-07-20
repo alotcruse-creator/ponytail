@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { Card, Dir } from "@/components/Card";
 import { api, type Sentiment, type News } from "@/lib/api";
+import { REFRESH_MS } from "@/lib/live";
 
 type Market = { sentiment: Sentiment[]; top_news: News[] };
 const EMPTY_MARKET: Market = { sentiment: [], top_news: [] };
+const EMPTY_REPORT = { report: "" };
 
 export default function EodPage() {
   const [report, setReport] = useState("");
@@ -12,10 +14,19 @@ export default function EodPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api<{ report: string }>("/end-of-day", { report: "" }),
+    let alive = true;
+    const load = () => Promise.all([
+      api<{ report: string }>("/end-of-day", EMPTY_REPORT),
       api<Market>("/market-summary", EMPTY_MARKET),
-    ]).then(([r, m]) => { setReport(r.report); setMarket(m); setLoading(false); });
+    ]).then(([r, m]) => {
+      if (!alive) return;
+      if (r !== EMPTY_REPORT) setReport(r.report);
+      if (m !== EMPTY_MARKET) setMarket(m);
+      setLoading(false);
+    });
+    load();
+    const id = setInterval(load, REFRESH_MS);
+    return () => { alive = false; clearInterval(id); };
   }, []);
 
   return (
